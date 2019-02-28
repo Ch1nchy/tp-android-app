@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">TeamProject</string>
+    <string name="menu1">Connected Devices</string>
+    <string name="menu2">Captured Images</string>
+    <string name="connected_devices">Connected Devices</string>
+    <string name="captured_images">Captured Images</string>
+</resources>

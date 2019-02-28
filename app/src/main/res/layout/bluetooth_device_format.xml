@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="8dp" >
+
+    <!-- http://www.sanktips.com/2017/10/12/android-custom-listview-with-image-and-text-example/ -->
+
+    <ImageView
+        android:id="@+id/bluetooth_logo"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:src="@drawable/ic_bluetooth"/>
+
+    <TextView
+        android:id="@+id/bluetooth_title"
+        android:text="Bluetooth Device Name"
+        android:textSize="20sp"
+        android:layout_marginTop="8dp"
+        android:maxLines="1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@id/bluetooth_logo"
+        android:layout_toEndOf="@id/bluetooth_logo"
+        android:layout_marginLeft="12dp"
+        android:layout_marginStart="12dp" />
+
+    <TextView
+        android:id="@+id/bluetooth_description"
+        android:text="Bluetooth Device Description"
+        android:textSize="14sp"
+        android:maxLines="1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/bluetooth_title"
+        android:layout_alignLeft="@id/bluetooth_title"
+        android:layout_alignStart="@id/bluetooth_title" />
+
+</RelativeLayout>
