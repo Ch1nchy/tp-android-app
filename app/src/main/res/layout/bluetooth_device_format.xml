@@ -4,37 +4,48 @@
     android:layout_height="match_parent"
     android:padding="8dp" >
 
-    <!-- http://www.sanktips.com/2017/10/12/android-custom-listview-with-image-and-text-example/ -->
-
-    <ImageView
-        android:id="@+id/bluetooth_logo"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
-        android:src="@drawable/ic_bluetooth"/>
-
-    <TextView
-        android:id="@+id/bluetooth_title"
-        android:text="Bluetooth Device Name"
-        android:textSize="20sp"
-        android:layout_marginTop="8dp"
-        android:maxLines="1"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_toRightOf="@id/bluetooth_logo"
-        android:layout_toEndOf="@id/bluetooth_logo"
-        android:layout_marginLeft="12dp"
-        android:layout_marginStart="12dp" />
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/bluetooth_description"
-        android:text="Bluetooth Device Description"
-        android:textSize="14sp"
-        android:maxLines="1"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/bluetooth_title"
-        android:layout_alignLeft="@id/bluetooth_title"
-        android:layout_alignStart="@id/bluetooth_title" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="2"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="4"
+                android:textColor="@android:color/black"
+                android:id="@+id/tv_name"/>
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textColor="@android:color/black"
+                android:id="@+id/tv_rssi"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="horizontal"
+            >
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textColor="@android:color/black"
+                android:id="@+id/tv_macaddr"/>
+
+        </LinearLayout>
+    </LinearLayout>
 
 </RelativeLayout>
