@@ -14,4 +14,6 @@
     <string name="no_btle_macaddr">No Mac Address</string>
     <string name="connected">Connected</string>
     <string name="disconnected">Disconnected</string>
+    <string name="connect">Connect</string>
+    <string name="disconnect">Disconnect</string>
 </resources>
