@@ -97,17 +97,11 @@ public class ConnectedDevices extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.main, menu);
         if (!mScanning) {
             menu.findItem(R.id.menu_stop).setVisible(false);
-
             menu.findItem(R.id.menu_scan).setVisible(true);
-            menu.findItem(R.id.menu_scan).setIcon(R.drawable.ic_search);
-
             menu.findItem(R.id.menu_refresh).setActionView(null);
         } else {
             menu.findItem(R.id.menu_stop).setVisible(true);
-            menu.findItem(R.id.menu_stop).setIcon(R.drawable.ic_stop);
-
             menu.findItem(R.id.menu_scan).setVisible(false);
-
             menu.findItem(R.id.menu_refresh).setActionView(R.layout.connected_devices_progressbar);
         }
         return true;
@@ -124,7 +118,7 @@ public class ConnectedDevices extends AppCompatActivity {
                 scanLeDevice(false);
                 break;
         }
-        return true;
+        return super.onOptionsItemSelected(item);
     }
 
     @Override protected void onResume() {
