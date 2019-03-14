@@ -1,19 +1,32 @@
 package com.duni.teamproject;
 
+import android.Manifest;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.pm.PermissionGroupInfo;
+import android.os.Build;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.support.v7.widget.Toolbar;
 import com.duni.teamproject.bluetooth.ConnectedDevices;
 
 public class MainActivity extends AppCompatActivity {
 
+    private static final String TAG = MainActivity.class.toString();
+
     private DrawerLayout drawerLayout;
+
+    private static final int PERMISSION_REQUEST_COARSE_LOCATION = 1;
+    private static final int PERMISSION_REQUEST_BLUETOOTH = 2;
+    private static final int PERMISSION_REQUEST_BLUETOOTH_ADMIN = 3;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,6 +67,93 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
         );
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            // Android M Permission check
+            if (this.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                // Request Location Permissions
+                final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setTitle("This app needs location access");
+                builder.setMessage("Location Access is needed so that the device can connect to Bluetooth Low Energy devices.");
+                builder.setPositiveButton(android.R.string.ok, null);
+                builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                    @Override
+                    public void onDismiss(DialogInterface dialog) {
+                        requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, PERMISSION_REQUEST_COARSE_LOCATION);
+                    }
+                });
+                builder.show();
+            }
+            if (this.checkSelfPermission(Manifest.permission.BLUETOOTH) != PackageManager.PERMISSION_GRANTED) {
+                // Request Bluetooth Permissions
+                requestPermissions(new String[]{Manifest.permission.BLUETOOTH}, PERMISSION_REQUEST_BLUETOOTH);
+            }
+            if (this.checkSelfPermission(Manifest.permission.BLUETOOTH_ADMIN) != PackageManager.PERMISSION_GRANTED) {
+                // Request Bluetooth Admin Permissions
+                requestPermissions(new String[]{Manifest.permission.BLUETOOTH}, PERMISSION_REQUEST_BLUETOOTH);
+            }
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults)
+    {
+        switch (requestCode) {
+            case PERMISSION_REQUEST_COARSE_LOCATION: {
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Log.d(TAG, "Coarse Location permission has been granted");
+                } else {
+                    final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                    builder.setTitle("Functionality Limited");
+                    builder.setMessage("Location Access has not been granted");
+                    builder.setPositiveButton(android.R.string.ok, null);
+                    builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                        @Override
+                        public void onDismiss(DialogInterface dialog) {
+
+                        }
+                    });
+                    builder.show();
+                }
+                return;
+            }
+            case PERMISSION_REQUEST_BLUETOOTH: {
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Log.d(TAG, "Bluetooth permission has been granted");
+                } else {
+                    final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                    builder.setTitle("Functionality Limited");
+                    builder.setMessage("Bluetooth LE Devices will not be able to be scanned");
+                    builder.setPositiveButton(android.R.string.ok, null);
+                    builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                        @Override
+                        public void onDismiss(DialogInterface dialog) {
+
+                        }
+                    });
+                    builder.show();
+                }
+                return;
+            }
+            case PERMISSION_REQUEST_BLUETOOTH_ADMIN: {
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Log.d(TAG, "Bluetooth Admin permission has been granted");
+                } else {
+                    final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                    builder.setTitle("Functionality Limited");
+                    builder.setMessage("Bluetooth LE Devices will not be able to be scanned");
+                    builder.setPositiveButton(android.R.string.ok, null);
+                    builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                        @Override
+                        public void onDismiss(DialogInterface dialog) {
+
+                        }
+                    });
+                    builder.show();
+                }
+                return;
+            }
+        }
     }
 
     @Override
