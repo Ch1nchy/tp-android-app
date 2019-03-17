@@ -10,6 +10,10 @@ public class GattAttributes {
     public static String DEVICE_INFORMATION_SERVICE =           "0000180a-0000-1000-8000-00805f9b34fb";
     public static String MANUFACTURER_NAME_STRING =             "00002a29-0000-1000-8000-00805f9b34fb";
 
+    // Two custom UUIDs:
+    public static String SWITCH_DATA =                          "F64A5671-345C-BC21-DB31-33DCFF312111";
+    public static String SWITCH_TOGGLE =                        "F64A5671-345C-BC21-DB31-33DCFF312112";
+
     static {
         // Sample Services
         attributes.put(HEART_RATE_SERVICE, "Heart Rate Service");
@@ -17,6 +21,8 @@ public class GattAttributes {
         attributes.put(HEART_RATE_MEASUREMENT, "Heart Rate Measurement");
         attributes.put(MANUFACTURER_NAME_STRING, "Manufacturer Name String");
         attributes.put(CLIENT_CHARACTERISTIC_CONFIG, "Client Characteristic Config");
+        attributes.put(SWITCH_DATA, "SecuriPi Switch Data");
+        attributes.put(SWITCH_TOGGLE, "SecuriPi Switch Toggle");
     }
 
     public static String lookup(String uuid, String defaultName) {
