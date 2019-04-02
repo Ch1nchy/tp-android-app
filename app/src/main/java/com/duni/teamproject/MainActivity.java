@@ -4,7 +4,6 @@ import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.content.pm.PermissionGroupInfo;
 import android.os.Build;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -16,7 +15,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 import android.support.v7.widget.Toolbar;
-import com.duni.teamproject.bluetooth.ConnectedDevices;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -25,8 +23,9 @@ public class MainActivity extends AppCompatActivity {
     private DrawerLayout drawerLayout;
 
     private static final int PERMISSION_REQUEST_COARSE_LOCATION = 1;
-    private static final int PERMISSION_REQUEST_BLUETOOTH = 2;
-    private static final int PERMISSION_REQUEST_BLUETOOTH_ADMIN = 3;
+    private static final int PERMISSION_REQUEST_ACCESS_WIFI_STATE = 2;
+    private static final int PERMISSION_REQUEST_CHANGE_WIFI_STATE = 3;
+    private static final int PERMISSION_REQUEST_INTERNET = 4;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,10 +50,6 @@ public class MainActivity extends AppCompatActivity {
                         // close drawer when item is tapped
                         drawerLayout.closeDrawers();
                         switch (menuItem.getItemId()) {
-                            case R.id.connected_devices:
-                                Intent openConDev = new Intent(MainActivity.this, ConnectedDevices.class);
-                                startActivity(openConDev);
-                                break;
                             case R.id.captured_images:
                                 Intent openCapIma = new Intent(MainActivity.this, CapturedImages.class);
                                 startActivity(openCapIma);
@@ -74,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
                 // Request Location Permissions
                 final AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 builder.setTitle("This app needs location access");
-                builder.setMessage("Location Access is needed so that the device can connect to Bluetooth Low Energy devices.");
+                builder.setMessage("Location Access is needed to scan for devices on a network");
                 builder.setPositiveButton(android.R.string.ok, null);
                 builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
                     @Override
@@ -84,13 +79,17 @@ public class MainActivity extends AppCompatActivity {
                 });
                 builder.show();
             }
-            if (this.checkSelfPermission(Manifest.permission.BLUETOOTH) != PackageManager.PERMISSION_GRANTED) {
-                // Request Bluetooth Permissions
-                requestPermissions(new String[]{Manifest.permission.BLUETOOTH}, PERMISSION_REQUEST_BLUETOOTH);
+            if (this.checkSelfPermission(Manifest.permission.ACCESS_WIFI_STATE) != PackageManager.PERMISSION_GRANTED) {
+                // Request Access Wifi State Permissions
+                requestPermissions(new String[]{Manifest.permission.ACCESS_WIFI_STATE}, PERMISSION_REQUEST_ACCESS_WIFI_STATE);
             }
-            if (this.checkSelfPermission(Manifest.permission.BLUETOOTH_ADMIN) != PackageManager.PERMISSION_GRANTED) {
-                // Request Bluetooth Admin Permissions
-                requestPermissions(new String[]{Manifest.permission.BLUETOOTH}, PERMISSION_REQUEST_BLUETOOTH);
+            if (this.checkSelfPermission(Manifest.permission.CHANGE_WIFI_STATE) != PackageManager.PERMISSION_GRANTED) {
+                // Request Change Wifi State Permissions
+                requestPermissions(new String[]{Manifest.permission.CHANGE_WIFI_STATE}, PERMISSION_REQUEST_CHANGE_WIFI_STATE);
+            }
+            if (this.checkSelfPermission(Manifest.permission.INTERNET) != PackageManager.PERMISSION_GRANTED) {
+                // Request Internet Permissions
+                requestPermissions(new String[]{Manifest.permission.INTERNET}, PERMISSION_REQUEST_INTERNET);
             }
         }
     }
@@ -117,13 +116,13 @@ public class MainActivity extends AppCompatActivity {
                 }
                 return;
             }
-            case PERMISSION_REQUEST_BLUETOOTH: {
+            case PERMISSION_REQUEST_ACCESS_WIFI_STATE: {
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    Log.d(TAG, "Bluetooth permission has been granted");
+                    Log.d(TAG, "Access Wifi State has been granted");
                 } else {
                     final AlertDialog.Builder builder = new AlertDialog.Builder(this);
                     builder.setTitle("Functionality Limited");
-                    builder.setMessage("Bluetooth LE Devices will not be able to be scanned");
+                    builder.setMessage("You will not be able to create Peer to Peer connections to SecuriPi devices.");
                     builder.setPositiveButton(android.R.string.ok, null);
                     builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
                         @Override
@@ -135,13 +134,31 @@ public class MainActivity extends AppCompatActivity {
                 }
                 return;
             }
-            case PERMISSION_REQUEST_BLUETOOTH_ADMIN: {
+            case PERMISSION_REQUEST_CHANGE_WIFI_STATE: {
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    Log.d(TAG, "Bluetooth Admin permission has been granted");
+                    Log.d(TAG, "Change Wifi State permission has been granted");
                 } else {
                     final AlertDialog.Builder builder = new AlertDialog.Builder(this);
                     builder.setTitle("Functionality Limited");
-                    builder.setMessage("Bluetooth LE Devices will not be able to be scanned");
+                    builder.setMessage("You will not be able to create Peer to Peer connections to SecuriPi devices.");
+                    builder.setPositiveButton(android.R.string.ok, null);
+                    builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                        @Override
+                        public void onDismiss(DialogInterface dialog) {
+
+                        }
+                    });
+                    builder.show();
+                }
+                return;
+            }
+            case PERMISSION_REQUEST_INTERNET: {
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Log.d(TAG, "Internet permission has been granted");
+                } else {
+                    final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                    builder.setTitle("Functionality Limited");
+                    builder.setMessage("You will not be able to create Peer to Peer connections to SecuriPi devices.");
                     builder.setPositiveButton(android.R.string.ok, null);
                     builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
                         @Override
