@@ -16,6 +16,8 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.support.v7.widget.Toolbar;
 
+import com.duni.teamproject.network.FindDevices;
+
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = MainActivity.class.toString();
@@ -53,6 +55,10 @@ public class MainActivity extends AppCompatActivity {
                             case R.id.captured_images:
                                 Intent openCapIma = new Intent(MainActivity.this, CapturedImages.class);
                                 startActivity(openCapIma);
+                                break;
+                            case R.id.find_devices:
+                                Intent openFinDev = new Intent(MainActivity.this, FindDevices.class);
+                                startActivity(openFinDev);
                                 break;
                         }
                         // Add code here to update the UI based on the item selected

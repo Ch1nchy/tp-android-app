@@ -1,5 +1,6 @@
 package com.duni.teamproject.network;
 
+import android.os.AsyncTask;
 import android.util.Log;
 
 import java.io.IOException;
@@ -15,6 +16,33 @@ public class NetworkUtils {
 
     public NetworkUtils() {
 
+    }
+
+    public static boolean verifyAddress(String ip, String port) {
+        String[] ipAdd = ip.split(Pattern.quote("."));
+        byte[] ba = new byte[4];
+        InetAddress t;
+
+        // Length check
+        if (ipAdd.length != 4) {
+            return false;
+        }
+
+        for (int i = 0; i < 4; i++) {
+            try {
+                ba[i] = (byte) Integer.parseInt(ipAdd[i]);
+            } catch (Exception e) {
+                return false;
+            }
+        }
+
+        try {
+            t = InetAddress.getByAddress(ba);
+        } catch (UnknownHostException e) {
+            return false;
+        }
+
+        return true;
     }
 
     public static InetAddress createNetMask(int length) {
@@ -125,7 +153,7 @@ public class NetworkUtils {
         return nAddress;
     }
 
-    private static byte[] convertAddressToByteArray(String address) {
+    public static byte[] convertAddressToByteArray(String address) {
         byte[] bAddress = new byte[4];
         String[] byteComponents = address.split(Pattern.quote("."));
 

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".network.FindDevices">
+
+    <item
+        android:id="@+id/scan_network"
+        android:orderInCategory="100"
+        android:icon="@drawable/ic_search"
+        app:showAsAction="always"/>
+    <item
+        android:id="@+id/connect_to"
+        android:orderInCategory="200"
+        android:icon="@drawable/ic_connect"
+        app:showAsAction="always"/>
+
+</menu>
