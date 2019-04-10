@@ -6,6 +6,9 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
@@ -18,16 +21,25 @@ import android.support.v7.widget.Toolbar;
 
 import com.duni.teamproject.network.FindDevices;
 
-public class MainActivity extends AppCompatActivity {
+import java.util.HashMap;
 
-    private static final String TAG = MainActivity.class.toString();
+public class MainActivity extends AppCompatActivity implements SecuriPiFragment.OnFragmentInteractionListener {
+
+    private static final String TAG = "MainActivity";
 
     private DrawerLayout drawerLayout;
+
+    private FindDevices findDevices;
+    private Session session;
+    private boolean SERVER_STATUS;
+    private HashMap<String, String> SERVER_DATA;
 
     private static final int PERMISSION_REQUEST_COARSE_LOCATION = 1;
     private static final int PERMISSION_REQUEST_ACCESS_WIFI_STATE = 2;
     private static final int PERMISSION_REQUEST_CHANGE_WIFI_STATE = 3;
     private static final int PERMISSION_REQUEST_INTERNET = 4;
+
+    private static final int REQUEST_CODE_1 = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,6 +53,10 @@ public class MainActivity extends AppCompatActivity {
         actionbar.setHomeAsUpIndicator(R.drawable.ic_menu);
 
         drawerLayout = findViewById(R.id.drawer_layout);
+
+        findDevices = new FindDevices();
+
+        session = new Session(getBaseContext());
 
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(
@@ -57,7 +73,7 @@ public class MainActivity extends AppCompatActivity {
                                 startActivity(openCapIma);
                                 break;
                             case R.id.find_devices:
-                                Intent openFinDev = new Intent(MainActivity.this, FindDevices.class);
+                                Intent openFinDev = new Intent(MainActivity.this, findDevices.getClass());
                                 startActivity(openFinDev);
                                 break;
                         }
@@ -97,6 +113,24 @@ public class MainActivity extends AppCompatActivity {
                 // Request Internet Permissions
                 requestPermissions(new String[]{Manifest.permission.INTERNET}, PERMISSION_REQUEST_INTERNET);
             }
+        }
+
+        // Retrieve data from Session manager...
+        SERVER_STATUS = session.getServerState();
+        SERVER_DATA = session.getServerData();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.d(TAG, "onResume() called");
+
+        // If FindDevices has sent the data to the MainActivity...
+        if (SERVER_DATA != null) {
+            loadFragment(SecuriPiFragment.newInstance(SERVER_STATUS, SERVER_DATA));
+            Log.d(TAG, "Creating SecuriPiFragment");
+        } else {
+            Log.e(TAG, "Could not load Fragment, SERVER_DATA = null");
         }
     }
 
@@ -187,5 +221,13 @@ public class MainActivity extends AppCompatActivity {
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void loadFragment(Fragment fragment) {
+        FragmentManager fm = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fm.beginTransaction();
+
+        fragmentTransaction.replace(R.id.fragment_frame, fragment);
+        fragmentTransaction.commit();
     }
 }

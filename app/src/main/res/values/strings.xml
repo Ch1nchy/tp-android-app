@@ -1,9 +1,11 @@
 <resources>
     <string name="app_name">SecuriPi</string>
-    <string name="menu1">Find Devices</string>
-    <string name="menu2">Captured Images</string>
-    <string name="connected_devices">Connected Devices</string>
+
+    // Navigation Drawer Titles:
+    <string name="find_devices">Find Devices</string>
     <string name="captured_images">Captured Images</string>
+
+    // BLE :
     <string name="unknown_device">Unknown Device</string>
     <string name="ble_not_supported">Bluetooth Low Energy is not supported on this device</string>
     <string name="error_bluetooth_not_supported">Error: Bluetooth is not supported on this device</string>
@@ -12,9 +14,15 @@
     <string name="stop_scan">Stop Scan</string>
     <string name="no_btle_name">No Name</string>
     <string name="no_btle_macaddr">No Mac Address</string>
+
+    // Misc
     <string name="connected">Connected</string>
     <string name="disconnected">Disconnected</string>
     <string name="connect">Connect</string>
     <string name="disconnect">Disconnect</string>
-    <string name="find_devices">Find Devices</string>
+
+    // SecuriPi Fragment:
+    <string name="securipi_title">Device Name: </string>
+    <string name="securipi_mac">Mac Address: </string>
+    <string name="securipi_status">Status: </string>
 </resources>

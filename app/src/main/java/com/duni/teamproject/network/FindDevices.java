@@ -2,6 +2,7 @@ package com.duni.teamproject.network;
 
 import android.app.Dialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
@@ -21,11 +22,14 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 
+import com.duni.teamproject.MainActivity;
 import com.duni.teamproject.R;
+import com.duni.teamproject.Session;
 import com.duni.teamproject.network.client.Client;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.HashMap;
 
 public class FindDevices extends AppCompatActivity {
 
@@ -35,7 +39,9 @@ public class FindDevices extends AppCompatActivity {
     PopupWindow connectPopup;
     View popupView;
 
-    //NetworkHandler nh;
+    private Session session;
+
+    private static Client client;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +54,8 @@ public class FindDevices extends AppCompatActivity {
         ActionBar ab = getSupportActionBar();
         ab.setDisplayHomeAsUpEnabled(true);
         ab.setTitle(R.string.find_devices);
+
+        session = new Session(getBaseContext());
 
         // Popup Window stuff...
         linearLayout = (LinearLayout) findViewById(R.id.ll_find_devices);
@@ -112,13 +120,6 @@ public class FindDevices extends AppCompatActivity {
         btnConnect.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // Close connection (if there is any):
-                /*
-                if (nh != null) {
-                    nh.close();
-                }
-                */
-
                 // Get text from the EditText forms:
                 String ipAddress = txtIpAddress.getText().toString();
                 String port = txtPort.getText().toString();
@@ -131,8 +132,15 @@ public class FindDevices extends AppCompatActivity {
                     try {
                         InetAddress add = InetAddress.getByAddress(NetworkUtils.convertAddressToByteArray(ipAddress));
                         // Create client object and attempt to connect to the device...
-                        Client c = new Client(add.getHostAddress(), 20101);
-                        c.execute();
+                        client = new Client(add.getHostAddress(), 20101);
+                        client.setCompleteListener(new Client.onCompleteListener() {
+                            public void onComplete(boolean status, HashMap<String, String> data) {
+                                // Add variables to session
+                                session.setServerState(status);
+                                session.setServerData(data);
+                            }
+                        });
+                        client.execute();
 
                     } catch (UnknownHostException e) {
                         e.printStackTrace();

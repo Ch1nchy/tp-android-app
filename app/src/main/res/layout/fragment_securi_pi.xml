@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".SecuriPiFragment">
+
+    <TextView
+        android:id="@+id/sp_f_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/securipi_title" />
+
+    <TextView
+        android:id="@+id/sp_f_mac"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/securipi_mac"/>
+
+    <TextView
+        android:id="@+id/sp_f_status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/securipi_status" />
+
+</FrameLayout>
