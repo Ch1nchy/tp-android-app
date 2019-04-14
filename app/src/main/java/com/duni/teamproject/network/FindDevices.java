@@ -1,30 +1,25 @@
 package com.duni.teamproject.network;
 
-import android.app.Dialog;
-import android.content.DialogInterface;
+import android.app.Activity;
 import android.content.Intent;
-import android.support.v4.app.DialogFragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.text.Layout;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 
-import com.duni.teamproject.MainActivity;
 import com.duni.teamproject.R;
-import com.duni.teamproject.Session;
+import com.duni.teamproject.session.Session;
 import com.duni.teamproject.network.client.Client;
 
 import java.net.InetAddress;
@@ -59,6 +54,36 @@ public class FindDevices extends AppCompatActivity {
 
         // Popup Window stuff...
         linearLayout = (LinearLayout) findViewById(R.id.ll_find_devices);
+
+        final EditText edtIpAddress = findViewById(R.id.fd_con_ip_address);
+        EditText edtPort = findViewById(R.id.fd_con_port);
+
+        Button btnConnect = findViewById(R.id.fd_connect);
+        btnConnect.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view) {
+                // Add intent data...
+                String ipAddress = edtIpAddress.getText().toString();
+                int port = 20101;
+
+                Intent resultIntent = new Intent();
+                resultIntent.putExtra("server_address", ipAddress);
+                resultIntent.putExtra("server_port", port);
+                setResult(Activity.RESULT_OK, resultIntent);
+                finish();
+            }
+        });
+
+        Button btnCancel = findViewById(R.id.fd_cancel);
+        btnCancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // add canceled data info here...
+                Intent resultIntent = new Intent();
+                setResult(Activity.RESULT_CANCELED, resultIntent);
+                finish();
+            }
+        });
     }
 
     @Override
@@ -70,7 +95,7 @@ public class FindDevices extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Add items to the action bar...
-        getMenuInflater().inflate(R.menu.find_devices_menu, menu);
+        //getMenuInflater().inflate(R.menu.find_devices_menu, menu);
         return true;
     }
 
@@ -114,6 +139,9 @@ public class FindDevices extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 connectPopup.dismiss();
+                Intent resultIntent = new Intent();
+                setResult(Activity.RESULT_CANCELED, resultIntent);
+                finish();
             }
         });
 
@@ -126,18 +154,44 @@ public class FindDevices extends AppCompatActivity {
 
                 boolean valid = NetworkUtils.verifyAddress(ipAddress, port);
 
+                if (valid) {
+                    Intent resultIntent = new Intent();
+                    resultIntent.putExtra("server_address", ipAddress);
+                    resultIntent.putExtra("server_port", 20101);
+                    setResult(Activity.RESULT_OK, resultIntent);
+                    finish();
+                }
+                /*
                 // Validate the IP Address supplied by user:
                 if (valid) {
                     // Connect and then close popup...
                     try {
-                        InetAddress add = InetAddress.getByAddress(NetworkUtils.convertAddressToByteArray(ipAddress));
+                        final InetAddress add = InetAddress.getByAddress(NetworkUtils.convertAddressToByteArray(ipAddress));
                         // Create client object and attempt to connect to the device...
                         client = new Client(add.getHostAddress(), 20101);
                         client.setCompleteListener(new Client.onCompleteListener() {
-                            public void onComplete(boolean status, HashMap<String, String> data) {
-                                // Add variables to session
-                                session.setServerState(status);
-                                session.setServerData(data);
+                            public void onComplete(boolean status, HashMap<String, String> data, String address) {
+                                // Add variables to Intent
+                                if (address != "") {
+                                    session.setServerState(status);
+                                    session.setServerData(data);
+                                    session.setServerAddress(address);
+                                } else {
+                                    // The server could not be found, clear any data that might still be there.
+                                    Log.e(TAG, "setOnClickListener(): address == null, session.clear() called");
+                                    session.clear();
+                                }
+
+
+                                /*
+                                if (valid) {
+                                    session.setServerState(status);
+                                    session.setServerData(data);
+                                    //session.setServerSocket(true);
+                                } else {
+                                    session.clear();
+                                }
+                                */ /*
                             }
                         });
                         client.execute();
@@ -155,6 +209,7 @@ public class FindDevices extends AppCompatActivity {
 
                     AlertDialog dialog = builder.create();
                 }
+                */
             }
         });
 

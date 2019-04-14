@@ -1,10 +1,15 @@
 package com.duni.teamproject;
 
 import android.Manifest;
+import android.app.Activity;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.os.Build;
+import android.os.IBinder;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -16,10 +21,14 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.support.v7.widget.Toolbar;
 
 import com.duni.teamproject.network.FindDevices;
+import com.duni.teamproject.network.client.Client;
+import com.duni.teamproject.network.services.ClientService;
+import com.duni.teamproject.session.Session;
 
 import java.util.HashMap;
 
@@ -31,15 +40,32 @@ public class MainActivity extends AppCompatActivity implements SecuriPiFragment.
 
     private FindDevices findDevices;
     private Session session;
+    private Client client;
+
+    private ClientService clientService;
+    private boolean shouldUnbindService;
+
     private boolean SERVER_STATUS;
     private HashMap<String, String> SERVER_DATA;
+    private String SERVER_ADDRESS;
 
     private static final int PERMISSION_REQUEST_COARSE_LOCATION = 1;
     private static final int PERMISSION_REQUEST_ACCESS_WIFI_STATE = 2;
     private static final int PERMISSION_REQUEST_CHANGE_WIFI_STATE = 3;
     private static final int PERMISSION_REQUEST_INTERNET = 4;
 
-    private static final int REQUEST_CODE_1 = 1;
+    private static final int REQUEST_CODE_LAUNCH_FD = 101;
+
+    private ServiceConnection mConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName className, IBinder service) {
+            clientService = ((ClientService.MyLocalBinder)service).getService();
+        }
+        @Override
+        public void onServiceDisconnected(ComponentName className) {
+            clientService = null;
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,10 +97,6 @@ public class MainActivity extends AppCompatActivity implements SecuriPiFragment.
                             case R.id.captured_images:
                                 Intent openCapIma = new Intent(MainActivity.this, CapturedImages.class);
                                 startActivity(openCapIma);
-                                break;
-                            case R.id.find_devices:
-                                Intent openFinDev = new Intent(MainActivity.this, findDevices.getClass());
-                                startActivity(openFinDev);
                                 break;
                         }
                         // Add code here to update the UI based on the item selected
@@ -115,9 +137,26 @@ public class MainActivity extends AppCompatActivity implements SecuriPiFragment.
             }
         }
 
-        // Retrieve data from Session manager...
-        SERVER_STATUS = session.getServerState();
-        SERVER_DATA = session.getServerData();
+        /*
+        if (validSession) {
+            // Retrieve data from Session manager...
+            SERVER_STATUS = session.getServerState();
+            SERVER_DATA = session.getServerData();
+        } else {
+            session.clear();
+        }*/
+
+        //SERVER_ADDRESS = session.getServerAddress();
+        /*
+        if (SERVER_ADDRESS != "") {
+            // validate the session server address, make sure it is still online
+            SERVER_STATUS = session.getServerState();
+            SERVER_DATA = session.getServerData();
+        } else {
+            session.clear();
+            Log.e(TAG, "onCreate(): Session Server Address returned null.");
+        }
+        */
     }
 
     @Override
@@ -214,13 +253,90 @@ public class MainActivity extends AppCompatActivity implements SecuriPiFragment.
     }
 
     @Override
+    public void onDestroy() {
+        super.onDestroy();
+        // Unbind service when activity is destroyed
+        doUnbindService();
+        //session.clear();
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
+        int id = item.getItemId();
+
+        switch (id) {
             case android.R.id.home:
                 drawerLayout.openDrawer(GravityCompat.START);
                 return true;
+            case R.id.launch_find_devices:
+                // launch find devices:
+                Intent intent = new Intent(MainActivity.this, FindDevices.class);
+                startActivityForResult(intent, REQUEST_CODE_LAUNCH_FD);
+                return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main_activity_menu, menu);
+        return true;
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch (requestCode) {
+            case (REQUEST_CODE_LAUNCH_FD):
+                if (resultCode == Activity.RESULT_OK) {
+                    // Extract data and launch client...
+                    String serverAddress = data.getStringExtra("server_address");
+                    int serverPort = data.getIntExtra("server_port", -1);
+                    Log.d(TAG, "server address : " + serverAddress + "\nserver port : " + serverPort);
+
+                    // start the service...
+                    Intent serviceIntent = new Intent(this, ClientService.class);
+                    serviceIntent.putExtra("serverIP", serverAddress);
+                    serviceIntent.putExtra("serverPort", serverPort);
+                    startService(serviceIntent);
+                    doBindServuce();
+
+                    // launch the client...
+                    /*
+                    client = new Client(serverAddress, serverPort);
+
+                    // retrieve variables from client...
+                    client.setCompleteListener(new Client.onCompleteListener() {
+                        @Override
+                        public void onComplete(boolean status, HashMap<String, String> serverData, String addr) {
+                            SERVER_STATUS = status;
+                            SERVER_DATA = serverData;
+                        }
+                    });
+                    client.execute();
+                    */
+                } else if (resultCode == Activity.RESULT_CANCELED) {
+                    Log.d(TAG, "resultCode == RESULT_CANCELED");
+                }
+                break;
+        }
+    }
+
+    private void doBindServuce() {
+        if (bindService(new Intent(MainActivity.this, ClientService.class),
+                mConnection, Context.BIND_AUTO_CREATE)) {
+            shouldUnbindService = true;
+        } else {
+            Log.e(TAG, "Error: the requested service doesn't exist, or this client isn't" +
+                    "allowed to access it.");
+        }
+    }
+
+    private void doUnbindService() {
+        if (shouldUnbindService) {
+            unbindService(mConnection);
+            shouldUnbindService = false;
+        }
     }
 
     private void loadFragment(Fragment fragment) {
